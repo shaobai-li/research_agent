@@ -88,9 +88,22 @@ response = client.chat.completions.create(
     model="deepseek-chat",
     messages=[
         {"role": "system", "content": SYSTEM_PROMPT_REPORT_STRUCTURE},
-        {"role": "user", "content": "请帮我调研一下全栈开发。"}
+        {"role": "user", "content": "请帮我调研一下web3.0的开发"}
     ]
 )
+
+# client = openai.OpenAI(
+#     api_key=os.getenv("OPENAI_API_KEY")
+# )
+
+# response = client.chat.completions.create(
+#     # model="gpt-3.5-turbo",
+#     model="gpt-4o-2024-08-06",
+#     messages=[
+#         {"role": "system", "content": SYSTEM_PROMPT_REPORT_STRUCTURE},
+#         {"role": "user", "content": "请帮我调研一下web3.0的开发"}
+#     ]
+# )
 
 # #print(response.choices[0].message.reasoning_content)
 print(response.choices[0].message.content)
