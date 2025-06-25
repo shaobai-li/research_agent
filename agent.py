@@ -83,13 +83,12 @@ for paragraph in report_structure:
     STATE.paragraphs.append(Paragraph(title=paragraph["title"], content=paragraph["content"]))
 
 
-print("第一段内容:")
-#print(json.dumps(STATE.paragraphs[0]))
-
+print("给Agent的第一个段落的内容:")
 input_json_first_search = {
     "title": STATE.paragraphs[0].title,
     "content": STATE.paragraphs[0].content
 }
+print(json.dumps(input_json_first_search))
 
 response = client.chat.completions.create(
     model="deepseek-reasoner",
@@ -100,4 +99,5 @@ response = client.chat.completions.create(
     temperature=1
     )
 
+print("Agent根据第一个段落输出的要做的搜索查询:")
 print(response.choices[0].message.content)

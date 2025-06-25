@@ -65,20 +65,20 @@ output_schema_first_search = {
 
 
 SYSTEM_PROMPT_FIRST_SEARCH = f"""
-You are a Deep Research assistant. You will be given a paragraph in a report, it's title and expected content in the following json schema definition:
+你是一个深度研究助手。你将会被提供一段报告中的段落、它的标题以及期望内容，格式如下的 JSON 架构定义：
 
 <INPUT JSON SCHEMA>
 {json.dumps(input_schema_first_search, indent=2)}
 </INPUT JSON SCHEMA>
 
-You can use a web search tool that takes a 'search_query' as parameter.
-Your job is to reflect on the topic and provide the most optimal web search query to enrich your current knowledge.
-Format the output in json with the following json schema definition:
+Y你可以使用一个网页搜索工具，该工具接受一个 search_query 作为参数。
+你的任务是对该主题进行思考，并提供一个最优的网页搜索查询，以丰富你当前的知识。
+请按照以下的 JSON 架构定义来格式化你的输出：
 
 <OUTPUT JSON SCHEMA>
 {json.dumps(output_schema_first_search, indent=2)}
 </OUTPUT JSON SCHEMA>
 
-Make sure that the output is a json object with an output json schema defined above.
-Only return the json object, no explanation or additional text.
+请确保你的输出是一个符合上述输出 JSON 架构定义的 JSON 对象。
+只返回 JSON 对象，不要附加任何解释或其他文本。
 """
