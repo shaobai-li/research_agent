@@ -4,7 +4,7 @@ import openai
 from dataclasses import dataclass, field
 from typing import List
 import json
-from system_prompt import SYSTEM_PROMPT_REPORT_STRUCTURE
+from system_prompts import SYSTEM_PROMPT_REPORT_STRUCTURE, SYSTEM_PROMPT_FIRST_SEARCH
 # from openai import OpenAI
 
 load_dotenv()
@@ -78,7 +78,26 @@ report_structure = json.loads(clean_json_tags(response.choices[0].message.conten
 
 STATE = State()
 
-
 print(type(report_structure))
 for paragraph in report_structure:
     STATE.paragraphs.append(Paragraph(title=paragraph["title"], content=paragraph["content"]))
+
+
+print("第一段内容:")
+#print(json.dumps(STATE.paragraphs[0]))
+
+input_json_first_search = {
+    "title": STATE.paragraphs[0].title,
+    "content": STATE.paragraphs[0].content
+}
+
+response = client.chat.completions.create(
+    model="deepseek-reasoner",
+    messages=[
+        {"role":"system","content":SYSTEM_PROMPT_FIRST_SEARCH},
+        {"role":"user","content":json.dumps(input_json_first_search)}
+        ],
+    temperature=1
+    )
+
+print(response.choices[0].message.content)
