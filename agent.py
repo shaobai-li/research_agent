@@ -4,7 +4,7 @@ import openai
 from dataclasses import dataclass, field
 from typing import List
 import json
-from system_prompts import SYSTEM_PROMPT_REPORT_STRUCTURE, SYSTEM_PROMPT_FIRST_SEARCH
+from system_prompts import SYSTEM_PROMPT_REPORT_STRUCTURE, SYSTEM_PROMPT_FIRST_SEARCH, SYSTEM_PROMPT_FIRST_SUMMARY
 from search_tool import tavily_search
 # from openai import OpenAI
 
@@ -50,11 +50,17 @@ client = openai.OpenAI(
     base_url="https://api.deepseek.com"
     )
 
+
+#### 第一个 Agent
+
+
+research_input = "请帮我调研一下web3.0的开发"
+
 response = client.chat.completions.create(
     model="deepseek-chat",
     messages=[
         {"role": "system", "content": SYSTEM_PROMPT_REPORT_STRUCTURE},
-        {"role": "user", "content": "请帮我调研一下web3.0的开发"}
+        {"role": "user", "content": research_input}
     ]
 )
 
@@ -72,22 +78,27 @@ response = client.chat.completions.create(
 # )
 
 # #print(response.choices[0].message.reasoning_content)
-print(response.choices[0].message.content)
 
 report_structure = json.loads(clean_json_tags(response.choices[0].message.content))
 
+print("根据输出的大纲更新状态...")
 STATE = State()
-
 print(type(report_structure))
 for paragraph in report_structure:
     STATE.paragraphs.append(Paragraph(title=paragraph["title"], content=paragraph["content"]))
 
+print("报告大纲：")
+for i, paragraph in enumerate(STATE.paragraphs):
+    print(f"第{i}个段落标题: {paragraph.title}") 
+    print(f"第{i}个段落内容: {paragraph.content}")
 
-print("给Agent的第一个段落的内容:")
+
+print("把第一个段落给搜索计划Agent，作为输入:")
 input_json_first_search = {
     "title": STATE.paragraphs[0].title,
     "content": STATE.paragraphs[0].content
 }
+
 print(json.dumps(input_json_first_search, ensure_ascii=False))
 
 response = client.chat.completions.create(
@@ -99,7 +110,7 @@ response = client.chat.completions.create(
     temperature=1
     )
 
-print("Agent根据第一个段落输出的要做的搜索查询:")
+print("搜索计划Agent根据第一个段落输出的要做的搜索查询:")
 search_interface = response.choices[0].message.content
 search_input = json.loads(search_interface)
 
@@ -108,11 +119,38 @@ print(search_input["search_query"])
 
 search_output = tavily_search(search_input["search_query"])
 
-print("搜索到的网页内容:")
-
+print("根据搜索结果更新状态...")
 STATE = update_state_with_search_results(search_output, 0, STATE)
 
-print("更新后的状态:")
+print("搜索到的结果：")
 for search in STATE.paragraphs[0].research.search_history:
     print(search.url)
     print(search.content)
+
+
+
+
+print("把搜索到的结果给写段落的Agent，作为输入:")
+input_json_search_results = {
+    "title": STATE.paragraphs[0].title,
+    "content": STATE.paragraphs[0].content,
+    "search_query": search_input["search_query"],
+    "search_results": [ result["raw_content"] for result in search_output["results"] if result["raw_content"]]
+}
+
+print(json.dumps(input_json_search_results, ensure_ascii=False))
+
+
+response = client.chat.completions.create(
+    model="deepseek-reasoner",
+    messages=[
+        {"role":"system","content":SYSTEM_PROMPT_FIRST_SUMMARY},
+        {"role":"user","content":json.dumps(input_json_first_search)}
+        ],
+    temperature=1
+    )
+
+print("Agent根据搜索结果输出的段落:")
+paragraph_output = json.loads(response.choices[0].message.content)
+
+print(paragraph_output["paragraph_latest_state"])

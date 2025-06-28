@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def tavily_search(query, include_raw_content=True, max_results=2):
+def tavily_search(query, include_raw_content=True, max_results=5):
 
     tavily_client = TavilyClient(
         api_key=os.getenv("TAVILY_API_KEY")

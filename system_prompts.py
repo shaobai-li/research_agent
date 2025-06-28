@@ -89,6 +89,7 @@ input_schema_first_summary = {
     "properties": {
         "title": {"type": "string"},
         "content": {"type": "string"},
+        "search_query": {"type": "string"},
         "search_results": {
             "type": "array",
             "items": {"type": "string"}
