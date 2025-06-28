@@ -45,7 +45,6 @@ def update_state_with_search_results(search_results, idx_paragraph, state):
         state.paragraphs[idx_paragraph].research.search_history.append(search)
     return state
 
-
 client = openai.OpenAI(
     api_key=os.getenv("DEEPSEEK_API_KEY"),
     base_url="https://api.deepseek.com"

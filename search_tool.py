@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def tavily_search(query, include_raw_content=True, max_results=5):
+def tavily_search(query, include_raw_content=True, max_results=2):
 
     tavily_client = TavilyClient(
         api_key=os.getenv("TAVILY_API_KEY")
@@ -19,6 +19,14 @@ def tavily_search(query, include_raw_content=True, max_results=5):
 
 
 if __name__ == "__main__":
-    result = tavily_search("web3.0的开发")
-    print(result)
-    print(type(result))
+    result = tavily_search("web3 development") 
+
+    # for r in result["results"]:
+    #     print(type(r["url"]))
+    #     print(r["url"])
+
+    #     print(type(r["content"]))
+    #     print(len(r["content"]))
+    #     print(r["content"])
+
+    #     print(r["raw_content"])

@@ -83,3 +83,45 @@ SYSTEM_PROMPT_FIRST_SEARCH = f"""
 只返回 JSON 对象，不要附加任何解释或其他文本。
 """
 
+
+input_schema_first_summary = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "content": {"type": "string"},
+        "search_results": {
+            "type": "array",
+            "items": {"type": "string"}
+            }
+        }
+    }
+
+output_schema_first_summary ={
+    "type": "object",
+    "properties": {
+        "paragraph_latest_state": {"type": "string"}
+        }
+}
+
+SYSTEM_PROMPT_FIRST_SUMMARY = f"""
+你是一个深度研究助手。你将会获得一个搜索查询、一组搜索结果，以及一份报告中的段落（需要你撰写），格式如下所示的 JSON 架构定义：
+
+<INPUT JSON SCHEMA>
+{json.dumps(input_schema_first_summary, indent=2)}
+</INPUT JSON SCHEMA>
+
+你的任务是：作为研究者，使用这些搜索结果来撰写该段落，使其内容与段落主题一致，并具有良好的结构，可以直接纳入到报告中。
+请将输出格式化为以下 JSON 格式定义：
+
+<OUTPUT JSON SCHEMA>
+{json.dumps(output_schema_first_summary, indent=2)}
+</OUTPUT JSON SCHEMA>
+
+确保输出是一个符合上述输出 JSON 格式定义的 JSON 对象。
+只返回 JSON 对象，不要附加解释或额外文本。
+"""
+
+
+
+
+
