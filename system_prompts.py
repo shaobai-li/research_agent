@@ -126,3 +126,40 @@ SYSTEM_PROMPT_FIRST_SUMMARY = f"""
 
 
 
+input_schema_reflection = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "content": {"type": "string"},
+        "paragraph_latest_state": {"type": "string"}
+        }
+    }
+
+output_schema_reflection = {
+    "type": "object",
+    "properties": {
+        "search_query": {"type": "string"},
+        "reasoning": {"type": "string"}
+        }
+    }
+
+SYSTEM_PROMPT_REFLECTION = f"""
+你是一位深度研究助理，负责为研究报告撰写全面的段落内容。你将会被提供以下内容：段落标题、计划撰写的内容摘要，以及你此前已经撰写的最新段落状态，所有这些信息都遵循以下 JSON 模式定义：
+
+<INPUT JSON SCHEMA>
+{json.dumps(input_schema_reflection, indent=2)}
+</INPUT JSON SCHEMA>
+
+你可以使用一个接受 search_query 参数的网页搜索工具。
+你的任务是对当前段落的文本状态进行反思，思考是否遗漏了该主题中的某些关键方面，并提供一个最优的网页搜索查询，以丰富当前段落内容。
+请使用以下的 JSON 模式格式化输出结果：
+
+<OUTPUT JSON SCHEMA>
+{json.dumps(output_schema_reflection, indent=2)}
+</OUTPUT JSON SCHEMA>
+
+请确保输出是一个符合上述输出 JSON 模式定义的 JSON 对象。
+只返回该 JSON 对象，不要包含任何解释或额外文字。
+始终输出中文内容。
+"""
+

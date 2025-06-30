@@ -4,7 +4,7 @@ import openai
 from dataclasses import dataclass, field
 from typing import List
 import json
-from system_prompts import SYSTEM_PROMPT_REPORT_STRUCTURE, SYSTEM_PROMPT_FIRST_SEARCH, SYSTEM_PROMPT_FIRST_SUMMARY
+from system_prompts import SYSTEM_PROMPT_REPORT_STRUCTURE, SYSTEM_PROMPT_FIRST_SEARCH, SYSTEM_PROMPT_FIRST_SUMMARY, SYSTEM_PROMPT_REFLECTION
 from search_tool import tavily_search
 # from openai import OpenAI
 
@@ -154,3 +154,26 @@ print("Agent根据搜索结果输出的段落:")
 paragraph_output = json.loads(response.choices[0].message.content)
 
 print(paragraph_output["paragraph_latest_state"])
+
+
+print("把当前段落的最新信息给反思Agent，作为输入:")
+
+input_json_reflection = {
+    "title": STATE.paragraphs[0].title,
+    "content": STATE.paragraphs[0].content,
+    "paragraph_latest_state": paragraph_output["paragraph_latest_state"]
+}
+
+response = client.chat.completions.create(
+    model="deepseek-reasoner",
+    messages=[
+        {"role":"system","content":SYSTEM_PROMPT_REFLECTION},
+        {"role":"user","content":json.dumps(input_json_reflection)}
+        ],
+    temperature=1
+    )
+
+reflection_output = json.loads(response.choices[0].message.content)
+
+print("反思Agent根据当前段落输出的要做的搜索查询:")
+print(reflection_output["search_query"])
